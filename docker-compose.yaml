@@ -11,10 +11,10 @@ services:
       - KUMO_LOG_LEVEL=debug
 
   fastapi:
+    container_name: fastapi
     build:
       context: ./
       dockerfile: ./.docker/fastapi/Dockerfile
-    container_name: fastapi
     volumes:
       - ./fastapi:/app
     ports:
@@ -30,3 +30,11 @@ services:
     volumes:
       - ./.docker/localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.
+
+  worker:
+    container_name: worker
+    build:
+      context: ./
+      dockerfile: ./.docker/worker/Dockerfile
+    volumes:
+      - ./worker:/app
