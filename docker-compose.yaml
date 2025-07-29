@@ -1,12 +1,21 @@
 services:
   kumod:
     container_name: kumod
-    hostname: kumod
     image: ghcr.io/kumocorp/kumomta:latest
     volumes:
       - ./.docker/kumod:/opt/kumomta/etc
     restart: unless-stopped
     ports:
-      - 25:2525
+      - "25:2525"
     environment:
       - KUMO_LOG_LEVEL=debug
+
+  fastapi:
+    build:
+      context: ./
+      dockerfile: ./.docker/fastapi/Dockerfile
+    container_name: fastapi
+    volumes:
+      - ./fastapi:/app
+    ports:
+      - "8080:8000"
