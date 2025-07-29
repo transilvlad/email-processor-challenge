@@ -1,0 +1,12 @@
+services:
+  kumod:
+    container_name: kumod
+    hostname: kumod
+    image: ghcr.io/kumocorp/kumomta:latest
+    volumes:
+      - ./.docker/kumod:/opt/kumomta/etc
+    restart: unless-stopped
+    ports:
+      - 25:2525
+    environment:
+      - KUMO_LOG_LEVEL=debug
