@@ -54,7 +54,7 @@ kumo.on('make.webhook', function(domain, tenant, campaign)
     local client = kumo.http.build_client {}
 
     function connection:send(message)
-        local api_uri = 'https://kumod.requestcatcher.com/'
+        local api_uri = 'http://fastapi:8080/'
 
         -- Prep message data
         local email_data = message:get_data()
@@ -65,8 +65,8 @@ kumo.on('make.webhook', function(domain, tenant, campaign)
 
         -- Prepare JSON payload with email meta and RAW message
         local payload = {
-            to = to_email,
-            from = from_email,
+            recipient = to_email,
+            sender = from_email,
             subject = message:get_first_named_header_value('Subject') or '',
             message_id = message:get_first_named_header_value('Message-ID'),
             raw_message = tostring(email_data), -- Ensure it's a string
