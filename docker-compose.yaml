@@ -29,13 +29,6 @@ services:
       - DEBUG=0
     volumes:
       - ./.docker/localstack/mount:/var/lib/localstack
+      - ./localstack:/app
       - /var/run/docker.sock:/var/run/docker.
       - ./.docker/localstack/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
-
-  worker:
-    container_name: worker
-    build:
-      context: ./
-      dockerfile: ./.docker/worker/Dockerfile
-    volumes:
-      - ./worker:/app
