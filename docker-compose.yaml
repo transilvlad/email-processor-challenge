@@ -30,5 +30,5 @@ services:
     volumes:
       - ./.docker/localstack/mount:/var/lib/localstack
       - ./localstack:/app
-      - /var/run/docker.sock:/var/run/docker.
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./.docker/localstack/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
