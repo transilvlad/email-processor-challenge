@@ -3,10 +3,22 @@ cd /app || exit
 
 echo "Initializing localstack"
 
+# Wait for LocalStack to be fully ready
+sleep 5
+
+# Set LocalStack environment variables
+export AWS_ENDPOINT_URL=http://localhost:4566
+export AWS_DEFAULT_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=local
+export AWS_SECRET_ACCESS_KEY=local
+
+# Create S3 bucket
 awslocal s3 mb s3://email-attachments
 
+# Create SQS queue
 awslocal sqs create-queue --queue-name email-processing
 
+# Create lambda function, map to SQS queue and zip python script
 zip lambda_function.zip lambda_function.py
 
 awslocal lambda create-function \
@@ -19,16 +31,28 @@ awslocal lambda create-function \
 awslocal lambda create-event-source-mapping \
             --function-name email-processor \
             --batch-size 5 \
+            --maximum-batching-window-in-seconds 60  \
             --event-source-arn arn:aws:sqs:us-east-1:000000000000:email-processing \
+            --endpoint-url http://localhost:4566 \
             --region us-east-1
 
-#awslocal dynamodb create-table \
-#            --table-name received \
-#            --attribute-definitions \
-#                 AttributeName=Subject,AttributeType=S \
-#                 AttributeName=MessageID,AttributeType=S \
-#                 AttributeName=Sender,AttributeType=S \
-#                 AttributeName=Recipient,AttributeType=S \
-#            --key-schema AttributeName=Subject,KeyType=HASH AttributeName=MessageID,KeyType=RANGE \
-#            --billing-mode PAY_PER_REQUEST \
-#            --table-class STANDARD
+
+# Create DynamoDB table for messages
+awslocal dynamodb create-table \
+    --endpoint-url http://localhost:4566 \
+    --region us-east-1 \
+    --table-name ProcessedEmails \
+    --attribute-definitions \
+        AttributeName=message,AttributeType=S \
+    --key-schema \
+        AttributeName=message,KeyType=HASH \
+    --billing-mode PAY_PER_REQUEST \
+    --tags Key=Environment,Value=LocalStack Key=Purpose,Value=EmailStorage
+
+# Wait for table to be active
+aws dynamodb wait table-exists \
+    --endpoint-url http://localhost:4566 \
+    --region us-east-1 \
+    --table-name ProcessedEmails
+
+echo "Localstack Initialized"
