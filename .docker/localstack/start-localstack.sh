@@ -16,12 +16,10 @@ awslocal lambda create-function \
             --handler lambda_function.lambda_handler \
             --role arn:aws:iam::000000000000:role/lambda-role
 
-aws lambda create-event-source-mapping \
+awslocal lambda create-event-source-mapping \
             --function-name email-processor \
             --batch-size 5 \
-            --maximum-batching-window-in-seconds 60  \
-            --event-source-arn arn:aws:sqs:us-east-1:000000000000:MyQueue \
-            --endpoint-url http://localhost:4566 \
+            --event-source-arn arn:aws:sqs:us-east-1:000000000000:email-processing \
             --region us-east-1
 
 #awslocal dynamodb create-table \
