@@ -43,9 +43,9 @@ awslocal dynamodb create-table \
     --region us-east-1 \
     --table-name ProcessedEmails \
     --attribute-definitions \
-        AttributeName=message,AttributeType=S \
+        AttributeName=message_id,AttributeType=S \
     --key-schema \
-        AttributeName=message,KeyType=HASH \
+        AttributeName=message_id,KeyType=HASH \
     --billing-mode PAY_PER_REQUEST \
     --tags Key=Environment,Value=LocalStack Key=Purpose,Value=EmailStorage
 
