@@ -1,7 +1,7 @@
-import asyncio
 from time import time
 
-import httpx
+import boto3
+from botocore.config import Config
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -21,29 +21,42 @@ class Message(BaseModel):
 
 # Read POST requests from root and task for forwarding
 @app.post("/")
-async def read_root(message: Message):
+def read_root(message: Message):
     start = time()
-    await task(message)
+    process(message)
     print("task time: ", time() - start)
     return message
 
 
-# Forward URL
-url = "https://kumod.requestcatcher.com/"
+# AWS URI's
+s3_url = "http://localstack:4566"
 
 
-# Async task
-async def task(message: Message):
-    async with httpx.AsyncClient() as client:
-        await asyncio.gather(post(client, message))
+# Upload message to S3 and queue in SQS
+def process(message: Message):
+    # Upload message to S3
+    s3_upload(message)
+
+    # TODO Queue in SQS
 
 
-# Async POST to forwarding URL
-# TODO Upload to S3 and queue in SQS instead
-async def post(client, message: Message):
-    response = await client.post(url,
-                                 headers={"Content-Type": "application/json"},
-                                 data=message.model_dump_json(),
-                                 )
-    print("post response: ", response.text)
-    return response.text
+# S3 upload
+def s3_upload(message: Message):
+    # Initialize the S3 client with LocalStack endpoint
+    s3_client = boto3.client(
+        's3',
+        endpoint_url=s3_url,
+        aws_access_key_id="local",
+        aws_secret_access_key="local",
+        config=Config(
+            retries={'max_attempts': 10, 'mode': 'standard'}
+        )
+    )
+
+    response = s3_client.put_object(
+        Body=message.raw_message,
+        Bucket="email-attachments",
+        Key=message.message_id + message.recipient,
+    )
+
+    print("s3 response: ", response)
