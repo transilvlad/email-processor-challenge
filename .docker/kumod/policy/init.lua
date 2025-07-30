@@ -54,7 +54,7 @@ kumo.on('make.webhook', function(domain, tenant, campaign)
     local client = kumo.http.build_client {}
 
     function connection:send(message)
-        local api_uri = 'http://fastapi:8080/'
+        local api_uri = 'http://fastapi:8000/'
 
         -- Prep message data
         local email_data = message:get_data()
