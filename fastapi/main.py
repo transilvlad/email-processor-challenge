@@ -1,13 +1,15 @@
 import asyncio
+from time import time
+
 import httpx
 from fastapi import FastAPI
 from pydantic import BaseModel
-from time import time
 
 app = FastAPI()
 
 
-class Item(BaseModel):
+# Message schema
+class Message(BaseModel):
     sender: str
     recipient: str = None
     raw_message: str = None
@@ -17,26 +19,31 @@ class Item(BaseModel):
     timestamp: float
 
 
+# Read POST requests from root and task for forwarding
 @app.post("/")
-async def read_root(item: Item):
+async def read_root(message: Message):
     start = time()
-    await task(item)
+    await task(message)
     print("task time: ", time() - start)
-    return item
+    return message
 
 
+# Forward URL
 url = "https://kumod.requestcatcher.com/"
 
 
-async def task(item: Item):
+# Async task
+async def task(message: Message):
     async with httpx.AsyncClient() as client:
-        await asyncio.gather(post(client, item))
+        await asyncio.gather(post(client, message))
 
 
-async def post(client, item: Item):
+# Async POST to forwarding URL
+# TODO Upload to S3 and queue in SQS instead
+async def post(client, message: Message):
     response = await client.post(url,
                                  headers={"Content-Type": "application/json"},
-                                 data=item.model_dump_json(),
+                                 data=message.model_dump_json(),
                                  )
     print("post response: ", response.text)
     return response.text
