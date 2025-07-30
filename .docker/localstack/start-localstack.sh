@@ -55,4 +55,4 @@ aws dynamodb wait table-exists \
     --region us-east-1 \
     --table-name ProcessedEmails
 
-echo "Localstack Initialized"
+echo "Localstack initialized"
