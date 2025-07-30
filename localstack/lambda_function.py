@@ -10,12 +10,11 @@ dynamodb = boto3.resource(
     'dynamodb',
     endpoint_url=os.environ.get('LOCALSTACK_URL', 'http://localhost:4566'),
     region_name=os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
-    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'test'),
-    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', 'test')
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', 'local')
 )
 
-table_name = os.environ.get('DYNAMODB_TABLE', 'ProcessedEmails')
-table = dynamodb.Table(table_name)
+table = dynamodb.Table(os.environ.get('DYNAMODB_TABLE', 'ProcessedEmails'))
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -34,6 +33,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
             # Extract email data from the message
             email_data = extract_email_data(message_body)
+            print(f"Extracted email data {email_data}")
 
             # Store email in DynamoDB using resource API
             store_email_in_dynamodb(email_data)
