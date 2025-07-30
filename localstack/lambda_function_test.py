@@ -9,30 +9,17 @@ if __name__ == "__main__":
         "Records": [
             {
                 "messageId": "test-message-id",
-                "body": json.dumps({
-                    "sender": "robin@transilvlad.net",
-                    "recipient": "robin@example.com",
-                    "raw_message": "",
-                    "domain": "example.com",
-                    "subject": "Lipsum",
-                    "message_id": "<c530b14d-4d3f-49e3-a931-2341465bab12-1753885206019robin@transilvlad.net>",
-                    "timestamp": 1753885206.0
-                })
+                "body": json.dumps(
+                    {'sender': 'robin@transilvlad.net', 'recipient': 'robin@example.com', 'raw_message': '',
+                     'domain': 'example.com', 'subject': 'Lipsum',
+                     'message_id': '<557828a4-7624-41bc-9f4e-c3a83b5babfe-1753893239239robin@transilvlad.net>',
+                     'timestamp': 1753893239.0})
             }
         ]
     }
 
-
-    # Mock context
-    class MockContext:
-        def __init__(self):
-            self.function_name = "test-function"
-            self.memory_limit_in_mb = 128
-            self.invoked_function_arn = "arn:aws:lambda:us-east-1:123456789012:function:test"
-
-
     try:
-        result = lambda_handler(test_event, MockContext())
+        result = lambda_handler(test_event, None)
         print("✅ Test passed!")
         print(json.dumps(result, indent=2))
     except Exception as e:
