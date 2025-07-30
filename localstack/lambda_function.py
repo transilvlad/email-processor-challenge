@@ -110,7 +110,6 @@ def extract_email_data(message_body: Dict[str, Any]) -> Dict[str, Any]:
         'subject': str(subject),
         'timestamp': iso_timestamp,
         'created_at': int(datetime.now().timestamp()),
-        'raw_message': message_body.get('raw_message', ''),
         'domain': message_body.get('domain', ''),
         'processed_at': datetime.now().isoformat()
     }
