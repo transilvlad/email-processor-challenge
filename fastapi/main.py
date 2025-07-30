@@ -30,6 +30,7 @@ def read_root(message: Message):
 
 # AWS URI's
 s3_url = "http://localstack:4566"
+sqs_url = "http://localstack:4566/000000000000/email-processing"
 
 
 # Upload message to S3 and queue in SQS
@@ -37,26 +38,45 @@ def process(message: Message):
     # Upload message to S3
     s3_upload(message)
 
-    # TODO Queue in SQS
+    # Queue in SQS
+    sqs_queue(message)
 
 
 # S3 upload
 def s3_upload(message: Message):
     # Initialize the S3 client with LocalStack endpoint
-    s3_client = boto3.client(
+    client = boto3.client(
         's3',
         endpoint_url=s3_url,
         aws_access_key_id="local",
         aws_secret_access_key="local",
         config=Config(
-            retries={'max_attempts': 10, 'mode': 'standard'}
+            retries={'max_attempts': 3, 'mode': 'standard'}
         )
     )
 
-    response = s3_client.put_object(
+    response = client.put_object(
         Body=message.raw_message,
         Bucket="email-attachments",
         Key=message.message_id + message.recipient,
     )
 
     print("s3 response: ", response)
+
+
+# SQS Queue
+def sqs_queue(message: Message):
+    client = boto3.client(
+        'sqs',
+        endpoint_url=sqs_url,
+        region_name='us-east-1',
+        aws_access_key_id="local",
+        aws_secret_access_key="local"
+    )
+    message.raw_message = ""  # Clear RAW message, queue meta only
+    response = client.send_message(
+        QueueUrl=sqs_url,
+        MessageBody=message.model_dump_json()
+    )
+
+    print("sqs response: ", response)
