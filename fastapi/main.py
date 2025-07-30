@@ -25,11 +25,6 @@ def read_root(message: Message):
     process(message)
 
 
-# AWS URI's
-s3_url = os.environ.get('LOCALSTACK_URL')
-sqs_url = os.environ.get('SQSQUEUE_URL')
-
-
 # Upload message to S3 and queue in SQS
 def process(message: Message):
     # Upload message to S3
@@ -44,9 +39,9 @@ def s3_upload(message: Message):
     # Initialize the S3 client with LocalStack endpoint
     client = boto3.client(
         's3',
-        endpoint_url=s3_url,
-        aws_access_key_id="local",
-        aws_secret_access_key="local",
+        endpoint_url=os.environ.get('LOCALSTACK_URL'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
+        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY', 'local'),
         config=Config(
             retries={'max_attempts': 3, 'mode': 'standard'}
         )
@@ -65,14 +60,14 @@ def s3_upload(message: Message):
 def sqs_queue(message: Message):
     client = boto3.client(
         'sqs',
-        endpoint_url=sqs_url,
-        region_name='us-east-1',
-        aws_access_key_id="local",
-        aws_secret_access_key="local"
+        endpoint_url=os.environ.get('SQSQUEUE_URL'),
+        region_name=os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
+        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY', 'local'),
     )
     message.raw_message = ""  # Clear RAW message, queue meta only
     response = client.send_message(
-        QueueUrl=sqs_url,
+        QueueUrl=os.environ.get('SQSQUEUE_URL'),
         MessageBody=message.model_dump_json()
     )
 
