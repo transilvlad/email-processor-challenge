@@ -1,4 +1,4 @@
-from time import time
+import os
 
 import boto3
 from botocore.config import Config
@@ -22,15 +22,12 @@ class Message(BaseModel):
 # Read POST requests from root and task for forwarding
 @app.post("/")
 def read_root(message: Message):
-    start = time()
     process(message)
-    print("task time: ", time() - start)
-    return message
 
 
 # AWS URI's
-s3_url = "http://localstack:4566"
-sqs_url = "http://localstack:4566/000000000000/email-processing"
+s3_url = os.environ.get('LOCALSTACK_URL')
+sqs_url = os.environ.get('SQSQUEUE_URL')
 
 
 # Upload message to S3 and queue in SQS

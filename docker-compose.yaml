@@ -19,6 +19,8 @@ services:
       - ./fastapi:/app
     ports:
       - "8080:8000"
+    env_file:
+      - ./.env
 
   localstack:
     container_name: localstack
@@ -32,3 +34,5 @@ services:
       - ./localstack:/app
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.docker/localstack/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+    env_file:
+      - ./.env
