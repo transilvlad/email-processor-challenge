@@ -1,14 +1,9 @@
 import json
-import logging
 import os
 from datetime import datetime
 from typing import Dict, Any
 
 import boto3
-
-# Configure logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 # Initialize DynamoDB resource (high-level API - recommended)
 dynamodb = boto3.resource(
@@ -24,7 +19,7 @@ table = dynamodb.Table(table_name)
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    logger.info(f"Processing {len(event.get('Records', []))} email messages")
+    print(f"Processing {len(event.get('Records', []))} email messages")
 
     successful_messages = []
     failed_messages = []
@@ -35,7 +30,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             message_body = json.loads(record['body'])
             message_id = record.get('messageId')
 
-            logger.info(f"Processing message {message_id}: {message_body}")
+            print(f"Processing message {message_id}: {message_body}")
 
             # Extract email data from the message
             email_data = extract_email_data(message_body)
@@ -48,10 +43,10 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'email_message_id': email_data['message_id']
             })
 
-            logger.info(f"Successfully processed message {message_id}")
+            print(f"Successfully processed message {message_id}")
 
         except Exception as e:
-            logger.error(f"Error processing message {record.get('messageId')}: {str(e)}")
+            print(f"Error processing message {record.get('messageId')}: {str(e)}")
             failed_messages.append({
                 'messageId': record.get('messageId'),
                 'error': str(e),
@@ -68,12 +63,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     }
 
     if failed_messages:
-        logger.warning(f"Failed to process {len(failed_messages)} messages")
+        print(f"Failed to process {len(failed_messages)} messages")
         # For partial failures, let successful messages be deleted
         if len(failed_messages) == len(event.get('Records', [])):
             raise Exception(f"All {len(failed_messages)} messages failed processing")
 
-    logger.info(f"Processing complete: {result}")
+    print(f"Processing complete: {result}")
     return result
 
 
@@ -119,8 +114,8 @@ def store_email_in_dynamodb(email_data: Dict[str, Any]) -> None:
     try:
         # Store the email data using resource API (automatically handles type conversion)
         table.put_item(Item=email_data)
-        logger.info(f"Stored email in DynamoDB: {email_data['message_id']}")
+        print(f"Stored email in DynamoDB: {email_data['message_id']}")
 
     except Exception as e:
-        logger.error(f"Failed to store email in DynamoDB: {str(e)}")
+        print(f"Failed to store email in DynamoDB: {str(e)}")
         raise
