@@ -1,4 +1,6 @@
+import json
 import os
+from datetime import datetime
 
 import boto3
 from botocore.config import Config
@@ -21,7 +23,17 @@ def lambda_handler(event, context):
             )
         )
 
+        data = json.loads(message)
+
+        item = {
+            'message_id': data["message_id"],
+            'subject': data["subject"],
+            'sender': data["sender"],
+            'recipient': data["recipient"],
+            'timestamp': datetime.now().isoformat()
+        }
+
         response = client.put_item(TableName='ProcessedEmails',
-                                   Item={'fruitName': {'S': 'Banana'}, 'key2': {'N': 'value2'}})
+                                   Item=item)
 
         print("db response", response)
