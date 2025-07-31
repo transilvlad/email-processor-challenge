@@ -1,9 +1,9 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, Any
 
-import boto3
+import boto3import json
 
 # Initialize DynamoDB resource (high-level API - recommended)
 dynamodb = boto3.resource(
@@ -94,9 +94,9 @@ def extract_email_data(message_body: Dict[str, Any]) -> Dict[str, Any]:
             dt = datetime.fromtimestamp(float(timestamp))
             iso_timestamp = dt.isoformat()
         except (ValueError, TypeError):
-            iso_timestamp = datetime.now(datetime.UTC).isoformat()
+            iso_timestamp = datetime.now(UTC).isoformat()
     else:
-        iso_timestamp = datetime.now(datetime.UTC).isoformat()
+        iso_timestamp = datetime.now(UTC).isoformat()
 
     return {
         'message_id': str(message_id),
@@ -104,9 +104,9 @@ def extract_email_data(message_body: Dict[str, Any]) -> Dict[str, Any]:
         'recipient': str(recipient),
         'subject': str(subject),
         'timestamp': iso_timestamp,
-        'created_at': int(datetime.now(datetime.UTC).timestamp()),
+        'created_at': int(datetime.now(UTC).timestamp()),
         'domain': message_body.get('domain', ''),
-        'processed_at': datetime.now(datetime.UTC).isoformat()
+        'processed_at': datetime.now(UTC).isoformat()
     }
 
 
