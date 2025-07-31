@@ -1,9 +1,17 @@
 import json
+import os
+from pathlib import Path
 
-from localstack.lambda_function import lambda_handler
+from dotenv import load_dotenv
 
 # For local testing
 if __name__ == "__main__":
+    # Load environment variables
+    dotenv_path = Path('../.env')
+    load_dotenv(dotenv_path=dotenv_path)
+    # Override localstack URL for localhost use
+    os.environ["LOCALSTACK_URL"] = "http://localhost:4566"
+
     # Sample test event
     test_event = {
         'Records': [
@@ -27,6 +35,8 @@ if __name__ == "__main__":
     }
 
     try:
+        from localstack.lambda_function import lambda_handler
+
         result = lambda_handler(test_event, None)
         print("✅ Test passed!")
         print(json.dumps(result, indent=2))
