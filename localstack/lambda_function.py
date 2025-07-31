@@ -3,7 +3,7 @@ import os
 from datetime import datetime, UTC
 from typing import Dict, Any
 
-import boto3import json
+import boto3
 
 # Initialize DynamoDB resource (high-level API - recommended)
 dynamodb = boto3.resource(
