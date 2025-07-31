@@ -1,4 +1,5 @@
 import os
+from typing import Dict, Any
 
 import boto3
 from botocore.config import Config
@@ -39,7 +40,7 @@ class AWSManager:
         self.aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         self.aws_default_region = os.environ.get('AWS_DEFAULT_REGION')
 
-    def s3_upload(self, message: Message):
+    def s3_upload(self, message: Message) -> Dict[str, Any]:
         """
         Uploads the raw message content to an S3 bucket.
 
@@ -61,8 +62,12 @@ class AWSManager:
                 Key=f"{message.message_id}-{message.recipient}"
             )
             print(f"S3 upload successful: {response}")
+
+            return response
+
         except Exception as e:
             print(f"S3 upload failed: {e}")
+            return {"error": True, "message": e}
 
     def sqs_queue(self, message: Message):
         """
@@ -88,8 +93,11 @@ class AWSManager:
                 MessageBody=message.model_dump_json()
             )
             print(f"SQS message queued successfully: {response}")
+            return response
+
         except Exception as e:
             print(f"SQS queuing failed: {e}")
+            return {"error": True, "message": e}
 
 
 # Initialize AWSManager
