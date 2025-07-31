@@ -2,8 +2,8 @@ Email Processor Challenge
 ==
 
 This application sets up KumoMTA container to post inbound messages to a FastAPI container
-which in turn takes the RAW email and puts it in S3 and the metadata and queues it in SQS
-only to be picked up by a lambda function which inserts the metadata into DynamoDB.
+which in turn takes the RAW email and puts it in S3 and then queues the metadata in SQS for processing
+via a lambda function which inserts the metadata into DynamoDB.
 
 How to test
 --
