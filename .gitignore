@@ -1,3 +1,6 @@
-/.idea/
 /.dev/
+/.idea/
+/.docker/localstack/mount/
+/.docker/kumod/.nodeid
+/localstack/*.zip
 /email-processor-challenge.iml
