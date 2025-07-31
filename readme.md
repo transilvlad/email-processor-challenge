@@ -5,7 +5,8 @@ This application sets up KumoMTA container to post inbound messages to a FastAPI
 which in turn takes the RAW email and puts it in S3 and then queues the metadata in SQS for processing
 via a lambda function which inserts the metadata into DynamoDB.
 
-How to test
+
+How to
 --
 
 - Run:
@@ -109,6 +110,81 @@ You should see an entry for each message recipient combination like this:
   "ConsumedCapacity": null
 }
 ```
+
+Development process
+--
+In the development of this application I used `requestcatcher.com` to validate the API calls up to SQS.
+
+1. Add container for KumoMTA and configure to POST messages to the sandbox first while also learning lua scripting.
+2. Add container for FastAPI and configure to receive the POST from KumoMTA and post it to the sandbox.
+3. Add container for localstack and implement S3 upload and SQS queueing in FastAPI.
+4. Write lambda function and test with an SQS mock payload using a test script and double check results in DynamoDB.
+5. Create lambda function and event source mapping and fight the gods of environment variables.
+
+Sending emails to KumoMTA can be done in many ways but me personally I used [Robin](https://github.com/mimecast/robin).
+Robin is designed for end to end MTA testing using JSON5 case files, this is the one I used:
+
+```json5
+{
+  $schema: "/schema/case.schema.json",
+  // Disable TLS.
+  tls: false,
+  // Email envelopes.
+  envelopes: [
+    // Envelope one.
+    {
+      // Envelope recipients.
+      rcpt: [
+        "robin@example.com",
+        "lady@example.com"
+      ],
+      // Email eml file to transmit.
+      file: "src/test/resources/cases/sources/lipsum.eml",
+      // Assertions to run against the envelope.
+      assertions: {
+        // Protocol assertions.
+        // Check SMTP responses match regular expressions.
+        protocol: [
+          [
+            "MAIL",
+            "250 OK"
+          ],
+          [
+            "RCPT",
+            "250 OK"
+          ],
+          [
+            "DATA",
+            "250 OK"
+          ]
+        ]
+      }
+    }
+  ],
+  // Assertions to run against the connection.
+  assertions: {
+    // Protocol assertions.
+    // Check SMTP responses match regular expressions.
+    protocol: [
+      [
+        "SMTP",
+        "^220"
+      ],
+      [
+        "EHLO",
+        "STARTTLS"
+      ],
+      [
+        "QUIT"
+      ]
+    ]
+  }
+}
+```
+
+I ran it just like in this Robin example case:
+https://github.com/mimecast/robin/blob/master/src/test/java/cases/ExampleSend.java
+
 
 Disclosure
 --
