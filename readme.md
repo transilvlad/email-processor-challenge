@@ -8,30 +8,49 @@ only to be picked up by a lambda function which inserts the metadata into Dynamo
 How to test
 --
 
+- Run:
 ```commandline
 docker compose up
 ```
 
-Send an email with your favorite client to localhost:25 addressed to anyone @example.com.
+Send an email with your favorite client to `localhost:25` addressed to anyone `@example.com`.
+You can send the email to multiple recipients as well.
 
-Wait for the email to process
+Wait for the email to process. You can watch the localstack container logs to see the process work.
 
+For example when an email with two recipients is received the logs will show:
+
+```
+AWS s3.PutObject => 200
+AWS s3.PutObject => 200
+AWS sqs.SendMessage => 200
+AWS sqs.SendMessage => 200
+AWS dynamodb.PutItem => 200
+AWS dynamodb.PutItem => 200
+```
+
+This demonstrates that when KumoMTA receives the email and pings FastAPI once for each recipient
+which then stores the email twice in S3 using a key derived by concatenating the Message-ID and Recipient address.
+
+Then it queues two SQS messages with the metadata of each recipient.
+
+SQS will trigger the lambda function which inserts the data in DynamoDB.
+
+To check the database run:
 ```commandline
 docker compose exec localstack bash
 ```
 
-This logs into the localstack container where you can query the DB
-
+This logs into the localstack container where you can query the DB with:
 ```commandline
-awslocal dynamodb scan --endpoint-url http://localhost:4566 --region us-east-1 --table-name ProcessedEmails --output table
+awslocal dynamodb scan --endpoint-url http://localhost:4566 --region us-east-1 --table-name ProcessedEmails
 ```
 
-If I got the insert to work you should see an entry,
-otherwise you can run `lambda_function_test.py` to make a call that will insert an entry you can query.
+You should see an entry for each message recipient combination.
 
 Disclosure
 --
 
 - My first Docker compose and AWS project.
-- Learning is a stressful adventure when pressed by time.
-- I know OOP, but time wasn't on my side.
+- Learning is a messy adventure under time pressure.
+- I know and love OOP, I'm just rusty in Python :)
