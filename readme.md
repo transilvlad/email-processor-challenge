@@ -127,12 +127,21 @@ Robin is designed for end to end MTA testing using JSON5 case files, this is the
 ```json5
 {
   $schema: "/schema/case.schema.json",
+  // Route.
+  mx: [
+    "localhost"
+  ],
+  port: 25,
   // Disable TLS.
   tls: false,
+  // EHLO domain.
+  ehlo: "transilvlad.net",
   // Email envelopes.
   envelopes: [
     // Envelope one.
     {
+      // Envelope sender.
+      mail: "vlad@transilvlad.net",
       // Envelope recipients.
       rcpt: [
         "robin@example.com",
