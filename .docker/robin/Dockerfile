@@ -10,4 +10,5 @@ WORKDIR /usr/src/robin/
 RUN mvn clean compile assembly:single && \
     cp target/robin-jar-with-dependencies.jar robin.jar
 
+# Keep container running. This is probably unwise for a prod environment.
 ENTRYPOINT ["tail", "-f", "/dev/null"]
