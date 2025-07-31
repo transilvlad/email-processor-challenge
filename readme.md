@@ -191,4 +191,6 @@ Disclosure
 
 - My first Docker compose and AWS project.
 - Learning is a messy adventure under time pressure.
-- I know and love OOP, I'm just rusty in Python :)
+- I haven't used Python in years.
+- I learnt more in the last 3 days than in the last year :D
+- [The obstacle is the way](https://en.wikipedia.org/wiki/The_Obstacle_Is_the_Way)
