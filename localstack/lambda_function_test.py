@@ -14,11 +14,10 @@ os.environ["LOCALSTACK_URL"] = "http://localhost:4566"
 
 def test_lambda_handler():
     """
-    Lambda function test requires the localstack container to run.
-    :return:
+    This test requires the localstack container to run.
     """
 
-    # Sample test event
+    # Sample SQS event with one record
     test_event = {
         'Records': [
             {
@@ -44,7 +43,7 @@ def test_lambda_handler():
     from localstack.lambda_function import lambda_handler
     result = lambda_handler(test_event, None)
 
-    # Print result and run assertions
+    # Print result
     print(json.dumps(result, indent=2))
 
     assert result['failed_count'] == 0
