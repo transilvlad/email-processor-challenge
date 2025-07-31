@@ -6,12 +6,6 @@ echo "Initializing localstack"
 # Wait for LocalStack to be fully ready
 sleep 5
 
-# Set LocalStack environment variables
-export AWS_ENDPOINT_URL=http://localhost:4566
-export AWS_DEFAULT_REGION=us-east-1
-export AWS_ACCESS_KEY_ID=local
-export AWS_SECRET_ACCESS_KEY=local
-
 # Create S3 bucket
 awslocal s3 mb s3://email-attachments
 
@@ -32,27 +26,29 @@ awslocal lambda create-event-source-mapping \
             --function-name email-processor \
             --batch-size 5 \
             --maximum-batching-window-in-seconds 60  \
-            --event-source-arn arn:aws:sqs:us-east-1:000000000000:email-processing \
+            --event-source-arn arn:aws:sqs:${AWS_DEFAULT_REGION}:000000000000:email-processing \
             --endpoint-url http://localhost:4566 \
-            --region us-east-1
+            --region ${AWS_DEFAULT_REGION}
 
 
 # Create DynamoDB table for messages
 awslocal dynamodb create-table \
     --endpoint-url http://localhost:4566 \
-    --region us-east-1 \
+    --region ${AWS_DEFAULT_REGION} \
     --table-name ProcessedEmails \
     --attribute-definitions \
         AttributeName=message_id,AttributeType=S \
+        AttributeName=timestamp,AttributeType=N \
     --key-schema \
         AttributeName=message_id,KeyType=HASH \
+        AttributeName=timestamp,KeyType=RANGE \
     --billing-mode PAY_PER_REQUEST \
     --tags Key=Environment,Value=LocalStack Key=Purpose,Value=EmailStorage
 
 # Wait for table to be active
 aws dynamodb wait table-exists \
     --endpoint-url http://localhost:4566 \
-    --region us-east-1 \
+    --region ${AWS_DEFAULT_REGION} \
     --table-name ProcessedEmails
 
 echo "Localstack initialized"
