@@ -17,6 +17,8 @@ docker compose up
 Send an email with your favorite client to `localhost:25` addressed to anyone `@example.com`.
 You can send the email to multiple recipients as well.
 
+See below how to run [Robin client](#robin-mta-tester) to send the sample email provided to KumoMTA container.
+
 Wait for the email to process. You can watch the localstack container logs to see the process work.
 
 For example when an email with two recipients is received the logs will show:
@@ -121,6 +123,7 @@ In the development of this application I used `requestcatcher.com` to validate t
 4. Write lambda function and test with an SQS mock payload using a test script and double check results in DynamoDB.
 5. Create lambda function and event source mapping and fight the gods of environment variables.
 
+### Robin MTA tester
 Sending emails to KumoMTA can be done in many ways but me personally I used [Robin](https://github.com/mimecast/robin).
 Robin is designed for end to end MTA testing using JSON5 case file.
 The sample used is located in [robin/lipsum.json5](robin/lipsum.json5).
@@ -136,7 +139,26 @@ Run robin client:
 java -jar robin.jar --client -c cfg/ -j cfg/lipsum.json5
 ```
 
-_Sadly it doesn't seem to output the transaction, only errors... working on it._
+_Sadly it doesn't seem to output the SMTP transaction, only usage and errors... working on it._
+
+#### Successful send example:
+
+```
+/usr/src/robin# java -jar robin.jar --client -c cfg/ -j cfg/lipsum.json5
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+```
+
+#### Failure example:
+
+```
+/usr/src/robin# java -jar robin.jar --client -c cfg/ -j cfg/lipsum.json5 
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Client error: main - Assert unable to find transaction for [DATA]
+```
 
 Disclosure
 --
