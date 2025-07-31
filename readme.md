@@ -122,78 +122,21 @@ In the development of this application I used `requestcatcher.com` to validate t
 5. Create lambda function and event source mapping and fight the gods of environment variables.
 
 Sending emails to KumoMTA can be done in many ways but me personally I used [Robin](https://github.com/mimecast/robin).
-Robin is designed for end to end MTA testing using JSON5 case files, this is the one I used:
+Robin is designed for end to end MTA testing using JSON5 case file.
+The sample used is located in [robin/lipsum.json5](robin/lipsum.json5).
+To run this connect to robin container bash:
 
-```json5
-{
-  $schema: "/schema/case.schema.json",
-  // Route.
-  mx: [
-    "localhost"
-  ],
-  port: 25,
-  // Disable TLS.
-  tls: false,
-  // EHLO domain.
-  ehlo: "transilvlad.net",
-  // Email envelopes.
-  envelopes: [
-    // Envelope one.
-    {
-      // Envelope sender.
-      mail: "vlad@transilvlad.net",
-      // Envelope recipients.
-      rcpt: [
-        "robin@example.com",
-        "lady@example.com"
-      ],
-      // Email eml file to transmit.
-      file: "src/test/resources/cases/sources/lipsum.eml",
-      // Assertions to run against the envelope.
-      assertions: {
-        // Protocol assertions.
-        // Check SMTP responses match regular expressions.
-        protocol: [
-          [
-            "MAIL",
-            "250 OK"
-          ],
-          [
-            "RCPT",
-            "250 OK"
-          ],
-          [
-            "DATA",
-            "250 OK"
-          ]
-        ]
-      }
-    }
-  ],
-  // Assertions to run against the connection.
-  assertions: {
-    // Protocol assertions.
-    // Check SMTP responses match regular expressions.
-    protocol: [
-      [
-        "SMTP",
-        "^220"
-      ],
-      [
-        "EHLO",
-        "STARTTLS"
-      ],
-      [
-        "QUIT"
-      ]
-    ]
-  }
-}
+```commandline
+ docker compose exec robin bash
 ```
 
-I ran it just like in this Robin example case:
-https://github.com/mimecast/robin/blob/master/src/test/java/cases/ExampleSend.java
+Run robin client:
 
+```commandline
+java -jar robin.jar --client -c cfg/ -j cfg/lipsum.json5
+```
+
+_Sadly it doesn't seem to output the transaction, only errors... working on it._
 
 Disclosure
 --

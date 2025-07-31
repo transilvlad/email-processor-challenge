@@ -1,0 +1,63 @@
+{
+  // Route.
+  mx: [
+    "kumod"
+  ],
+  port: 2525,
+  // Disable TLS.
+  tls: false,
+  // EHLO domain.
+  ehlo: "transilvlad.net",
+  // Email envelopes.
+  envelopes: [
+    // Envelope one.
+    {
+      // Envelope sender.
+      mail: "vlad@transilvlad.net",
+      // Envelope recipients.
+      rcpt: [
+        "robin@example.com",
+        "lady@example.com"
+      ],
+      // Email eml file to transmit.
+      file: "cfg/lipsum.eml",
+      // Assertions to run against the envelope.
+      assertions: {
+        // Protocol assertions.
+        // Check SMTP responses match regular expressions.
+        protocol: [
+          [
+            "MAIL",
+            "250 OK"
+          ],
+          [
+            "RCPT",
+            "250 OK"
+          ],
+          [
+            "DATA",
+            "250 OK"
+          ]
+        ]
+      }
+    }
+  ],
+  // Assertions to run against the connection.
+  assertions: {
+    // Protocol assertions.
+    // Check SMTP responses match regular expressions.
+    protocol: [
+      [
+        "SMTP",
+        "^220"
+      ],
+      [
+        "EHLO",
+        "STARTTLS"
+      ],
+      [
+        "QUIT"
+      ]
+    ]
+  }
+}

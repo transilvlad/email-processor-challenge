@@ -37,3 +37,11 @@ services:
       - ./.env:/app/.env
     env_file:
       - ./.env
+
+  robin:
+    container_name: robin
+    build:
+      context: ./
+      dockerfile: ./.docker/robin/Dockerfile
+    volumes:
+      - ./robin:/usr/src/robin/cfg/
