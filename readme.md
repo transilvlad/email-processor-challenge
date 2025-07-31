@@ -20,7 +20,7 @@ Wait for the email to process. You can watch the localstack container logs to se
 
 For example when an email with two recipients is received the logs will show:
 
-```
+```pycon
 AWS s3.PutObject => 200
 AWS s3.PutObject => 200
 AWS sqs.SendMessage => 200
@@ -46,7 +46,69 @@ This logs into the localstack container where you can query the DB with:
 awslocal dynamodb scan --endpoint-url http://localhost:4566 --region us-east-1 --table-name ProcessedEmails
 ```
 
-You should see an entry for each message recipient combination.
+You should see an entry for each message recipient combination like this:
+
+```json
+{
+  "Items": [
+    {
+      "sender": {
+        "S": "robin@transilvlad.net"
+      },
+      "subject": {
+        "S": "Lipsum"
+      },
+      "domain": {
+        "S": "example.com"
+      },
+      "recipient": {
+        "S": "lady@example.com"
+      },
+      "created_at": {
+        "N": "1753959198"
+      },
+      "processed_at": {
+        "S": "2025-07-31T10:53:18.382667+00:00"
+      },
+      "message_id": {
+        "S": "<10edbace-9dd2-4335-a978-47159a2d3c8a-1753959157566robin@transilvlad.net>"
+      },
+      "timestamp": {
+        "S": "2025-07-31T10:52:37"
+      }
+    },
+    {
+      "sender": {
+        "S": "robin@transilvlad.net"
+      },
+      "subject": {
+        "S": "Lipsum"
+      },
+      "domain": {
+        "S": "example.com"
+      },
+      "recipient": {
+        "S": "robin@example.com"
+      },
+      "created_at": {
+        "N": "1753959198"
+      },
+      "processed_at": {
+        "S": "2025-07-31T10:53:18.274790+00:00"
+      },
+      "message_id": {
+        "S": "<10edbace-9dd2-4335-a978-47159a2d3c8a-1753959157566robin@transilvlad.net>"
+      },
+      "timestamp": {
+        "S": "2025-07-31T10:52:37"
+      }
+    }
+  ],
+  "Count": 2,
+  "ScannedCount": 2,
+  "ConsumedCapacity": null
+}
+```
 
 Disclosure
 --
