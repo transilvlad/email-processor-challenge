@@ -40,8 +40,8 @@ def s3_upload(message: Message):
     client = boto3.client(
         's3',
         endpoint_url=os.environ.get('LOCALSTACK_URL'),
-        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
-        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY', 'local'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY'),
         config=Config(
             retries={'max_attempts': 3, 'mode': 'standard'}
         )
@@ -61,9 +61,9 @@ def sqs_queue(message: Message):
     client = boto3.client(
         'sqs',
         endpoint_url=os.environ.get('SQSQUEUE_URL'),
-        region_name=os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
-        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
-        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY', 'local'),
+        region_name=os.environ.get('AWS_DEFAULT_REGION'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY_KEY'),
     )
     message.raw_message = ""  # Clear RAW message, queue meta only
     response = client.send_message(

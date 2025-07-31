@@ -8,13 +8,13 @@ import boto3
 # Initialize DynamoDB resource (high-level API - recommended)
 dynamodb = boto3.resource(
     'dynamodb',
-    endpoint_url=os.environ.get('LOCALSTACK_URL', 'http://localhost:4566'),
-    region_name=os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
-    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'local'),
-    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', 'local')
+    endpoint_url=os.environ.get('LOCALSTACK_URL'),
+    region_name=os.environ.get('AWS_DEFAULT_REGION'),
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
 )
 
-table = dynamodb.Table(os.environ.get('DYNAMODB_TABLE', 'ProcessedEmails'))
+table = dynamodb.Table(os.environ.get('DYNAMODB_TABLE'))
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -94,9 +94,9 @@ def extract_email_data(message_body: Dict[str, Any]) -> Dict[str, Any]:
             dt = datetime.fromtimestamp(float(timestamp))
             iso_timestamp = dt.isoformat()
         except (ValueError, TypeError):
-            iso_timestamp = datetime.now().isoformat()
+            iso_timestamp = datetime.now(datetime.UTC).isoformat()
     else:
-        iso_timestamp = datetime.now().isoformat()
+        iso_timestamp = datetime.now(datetime.UTC).isoformat()
 
     return {
         'message_id': str(message_id),
@@ -104,9 +104,9 @@ def extract_email_data(message_body: Dict[str, Any]) -> Dict[str, Any]:
         'recipient': str(recipient),
         'subject': str(subject),
         'timestamp': iso_timestamp,
-        'created_at': int(datetime.now().timestamp()),
+        'created_at': int(datetime.now(datetime.UTC).timestamp()),
         'domain': message_body.get('domain', ''),
-        'processed_at': datetime.now().isoformat()
+        'processed_at': datetime.now(datetime.UTC).isoformat()
     }
 
 
