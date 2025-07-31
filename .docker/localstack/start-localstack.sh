@@ -20,7 +20,8 @@ awslocal lambda create-function \
             --runtime python3.13 \
             --zip-file fileb://lambda_function.zip \
             --handler lambda_function.lambda_handler \
-            --role arn:aws:iam::000000000000:role/lambda-role
+            --role arn:aws:iam::000000000000:role/lambda-role \
+            --environment Variables="{`cat .env | xargs | sed 's/ /,/g'`}"
 
 awslocal lambda create-event-source-mapping \
             --function-name email-processor \
@@ -38,10 +39,10 @@ awslocal dynamodb create-table \
     --table-name ProcessedEmails \
     --attribute-definitions \
         AttributeName=message_id,AttributeType=S \
-        AttributeName=timestamp,AttributeType=N \
+        AttributeName=sender,AttributeType=S \
     --key-schema \
         AttributeName=message_id,KeyType=HASH \
-        AttributeName=timestamp,KeyType=RANGE \
+        AttributeName=sender,KeyType=RANGE \
     --billing-mode PAY_PER_REQUEST \
     --tags Key=Environment,Value=LocalStack Key=Purpose,Value=EmailStorage
 

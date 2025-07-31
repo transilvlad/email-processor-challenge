@@ -34,5 +34,6 @@ services:
       - ./localstack:/app
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.docker/localstack/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+      - ./.env:/app/.env
     env_file:
       - ./.env
