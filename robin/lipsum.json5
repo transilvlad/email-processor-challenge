@@ -4,8 +4,10 @@
     "kumod"
   ],
   port: 2525,
+
   // Disable TLS.
   tls: false,
+
   // EHLO domain.
   ehlo: "transilvlad.net",
   // Email envelopes.
